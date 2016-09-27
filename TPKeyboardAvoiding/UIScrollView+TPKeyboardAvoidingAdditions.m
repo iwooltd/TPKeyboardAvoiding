@@ -43,7 +43,7 @@ static const int kStateKey;
 }
 
 - (void)TPKeyboardAvoiding_keyboardWillShow:(NSNotification*)notification {
-    CGRect keyboardRect = [self convertRect:[[[notification userInfo] objectForKey:_UIKeyboardFrameEndUserInfoKey] CGRectValue] fromView:nil];
+    CGRect keyboardRect = [self convertRect:[notification.userInfo[_UIKeyboardFrameEndUserInfoKey] CGRectValue] fromView:nil];
     if (CGRectIsEmpty(keyboardRect)) {
         return;
     }
@@ -82,8 +82,8 @@ static const int kStateKey;
     [UIView setAnimationWillStartSelector:@selector(keyboardViewAppear:context:)];
     [UIView setAnimationDidStopSelector:@selector(keyboardViewDisappear:finished:context:)];
     
-    [UIView setAnimationCurve:[[[notification userInfo] objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
-    [UIView setAnimationDuration:[[[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey] floatValue]];
+    [UIView setAnimationCurve:[notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] intValue]];
+    [UIView setAnimationDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue]];
     
     self.contentInset = [self TPKeyboardAvoiding_contentInsetForKeyboard];
     
@@ -113,7 +113,7 @@ static const int kStateKey;
 }
 
 - (void)TPKeyboardAvoiding_keyboardWillHide:(NSNotification*)notification {
-    CGRect keyboardRect = [self convertRect:[[[notification userInfo] objectForKey:_UIKeyboardFrameEndUserInfoKey] CGRectValue] fromView:nil];
+    CGRect keyboardRect = [self convertRect:[notification.userInfo[_UIKeyboardFrameEndUserInfoKey] CGRectValue] fromView:nil];
     if (CGRectIsEmpty(keyboardRect) && !self.keyboardAvoidingState.keyboardAnimationInProgress) {
         return;
     }
@@ -133,8 +133,8 @@ static const int kStateKey;
     
     // Restore dimensions to prior size
     [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationCurve:[[[notification userInfo] objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
-    [UIView setAnimationDuration:[[[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey] floatValue]];
+    [UIView setAnimationCurve:[notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] intValue]];
+    [UIView setAnimationDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue]];
     
     if ( [self isKindOfClass:[TPKeyboardAvoidingScrollView class]] ) {
         self.contentSize = state.priorContentSize;
@@ -219,7 +219,7 @@ static const int kStateKey;
 - (UIView*)TPKeyboardAvoiding_findFirstResponderBeneathView:(UIView*)view {
     // Search recursively for first responder
     for ( UIView *childView in view.subviews ) {
-        if ( [childView respondsToSelector:@selector(isFirstResponder)] && [childView isFirstResponder] ) return childView;
+        if ( [childView respondsToSelector:@selector(isFirstResponder)] && childView.isFirstResponder ) return childView;
         UIView *result = [self TPKeyboardAvoiding_findFirstResponderBeneathView:childView];
         if ( result ) return result;
     }
@@ -364,8 +364,8 @@ static const int kStateKey;
 - (void)TPKeyboardAvoiding_initializeView:(UIView*)view {
     if ( [view isKindOfClass:[UITextField class]]
             && ((UITextField*)view).returnKeyType == UIReturnKeyDefault
-            && (![(UITextField*)view delegate] || [(UITextField*)view delegate] == (id<UITextFieldDelegate>)self) ) {
-        [(UITextField*)view setDelegate:(id<UITextFieldDelegate>)self];
+            && (!((UITextField*)view).delegate || ((UITextField*)view).delegate == (id<UITextFieldDelegate>)self) ) {
+        ((UITextField*)view).delegate = (id<UITextFieldDelegate>)self;
         UIView *otherView = [self TPKeyboardAvoiding_findNextInputViewAfterView:view beneathView:self];
         
         if ( otherView ) {

@@ -22,13 +22,14 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scrollToActiveTextField) name:UITextFieldTextDidBeginEditingNotification object:nil];
 }
 
--(id)initWithFrame:(CGRect)frame {
+-(instancetype)initWithFrame:(CGRect)frame {
     if ( !(self = [super initWithFrame:frame]) ) return nil;
     [self setup];
     return self;
 }
 
 -(void)awakeFromNib {
+    [super awakeFromNib];
     [self setup];
 }
 
@@ -40,12 +41,12 @@
 }
 
 -(void)setFrame:(CGRect)frame {
-    [super setFrame:frame];
+    super.frame = frame;
     [self TPKeyboardAvoiding_updateContentInset];
 }
 
 -(void)setContentSize:(CGSize)contentSize {
-    [super setContentSize:contentSize];
+    super.contentSize = contentSize;
     [self TPKeyboardAvoiding_updateFromContentSizeChange];
 }
 
